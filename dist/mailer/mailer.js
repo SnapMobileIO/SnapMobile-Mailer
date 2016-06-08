@@ -28,19 +28,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Mailer = function () {
   function Mailer() {
-    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var mailOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Mailer);
 
-    this.options = options;
-    this.options.auth = { api_key: process.env.SENDGRID_KEY };
-
-    this.mailOptions = {};
-    this.mailOptions.to = options.to || null;
-    this.mailOptions.from = options.from || 'example@example.com';
-    this.mailOptions.subject = options.subject || null;
-    this.mailOptions.text = options.text || null;
-    this.mailOptions.html = options.html || null;
+    this.options = { auth: { api_key: process.env.SENDGRID_KEY } };
+    this.mailOptions = mailOptions;
   }
 
   _createClass(Mailer, [{
