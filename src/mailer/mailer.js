@@ -7,16 +7,9 @@ import Promise from 'bluebird';
 
 class Mailer {
 
-  constructor(options = {}) {
-    this.options = options;
-    this.options.auth = { api_key: process.env.SENDGRID_KEY };
-
-    this.mailOptions = {};
-    this.mailOptions.to = options.to || null;
-    this.mailOptions.from = options.from || 'example@example.com';
-    this.mailOptions.subject = options.subject || null;
-    this.mailOptions.text = options.text || null;
-    this.mailOptions.html = options.html || null;
+  constructor(mailOptions = {}) {
+    this.options = { auth: { api_key: process.env.SENDGRID_KEY } };
+    this.mailOptions = mailOptions;
   }
 
   getHtml(templateContent, data) {
