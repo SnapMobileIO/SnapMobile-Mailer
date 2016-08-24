@@ -26,6 +26,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var sendgridHelper = require('sendgrid').mail;
+var sendgrid = require('sendgrid')(process.env.SENDGRID_KEY);
+
 var Mailer = function () {
   function Mailer() {
     var mailOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -64,6 +67,65 @@ var Mailer = function () {
 
           resolve(response);
         });
+      });
+    }
+
+    /**
+     * Sends a Sendgrid email with the Template ID
+     * @param  {String} to          the to email
+     * @param  {String} from        the from email
+     * @param  {String} subject     the email subject
+     * @param  {String} templateId  the Sendgrid template ID
+     * @param  {Array} substitions  an array of substitions
+     * @return {Promise}            a promise of the email.
+     */
+
+  }, {
+    key: 'sendMailFromTemplate',
+    value: function sendMailFromTemplate(to, from, subject, templateId, substitions) {
+      var mail = new sendgridHelper.Mail();
+      mail.setFrom(sendgridHelper.Email(from));
+      mail.setSubject(subject);
+      mail.setTemplateId(templateId);
+      var personalization = new sendgridHelper.Personalization();
+      personalization.addTo(new sendgridHelper.Email(to));
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = substitions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var substition = _step.value;
+
+          personalization.addSubstitution(new sendgridHelper.Substitution('%' + substition.name + '%', substition.value));
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      mail.addPersonalization(personalization);
+      var request = sendgrid.emptyRequest({
+        method: 'POST',
+        path: '/v3/mail/send',
+        body: mail.toJSON()
+      });
+
+      return sendgrid.API(request).then(function (response) {
+        console.log('Email template sent to ' + to + ', from ' + from + ', subject ' + subject + '.');
+      }).catch(function (err) {
+        console.log(err);
       });
     }
   }]);
