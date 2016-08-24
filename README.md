@@ -32,6 +32,20 @@ To configure, add the following when using the module:
           });
         })
         .catch(utils.handleError(next));
+        
+### Sending from SendGrid templates
+
+To send from a SendGrid template:
+
+```
+let mailer = new Mailer();
+  mailer.sendMailFromTemplate('to@gmail.com', 'from@example.com',
+    'Subject', 'template_id', [{
+      name: 'substitution1', /* in template as %substitution1% */
+      value: 'Referral Complete',
+    }, ...
+    ]);
+```
 
 # Updating
 
