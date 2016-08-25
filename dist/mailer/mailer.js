@@ -72,46 +72,24 @@ var Mailer = function () {
 
     /**
      * Sends a Sendgrid email with the Template ID
-     * @param  {String} to          the to email
-     * @param  {String} from        the from email
-     * @param  {String} subject     the email subject
-     * @param  {String} templateId  the Sendgrid template ID
-     * @param  {Array} substitions  an array of substitions
-     * @return {Promise}            a promise of the email.
+     * Defaults to process.env.FROM_EMAIL
+     * @param  {Options} options the options for the email
+     * @return {Promise} a promise of the email.
      */
 
   }, {
     key: 'sendMailFromTemplate',
-    value: function sendMailFromTemplate(to, from, subject, templateId, substitions) {
+    value: function sendMailFromTemplate(options) {
       var mail = new sendgridHelper.Mail();
-      mail.setFrom(sendgridHelper.Email(from));
-      mail.setSubject(subject);
-      mail.setTemplateId(templateId);
+      mail.setFrom(sendgridHelper.Email(options.from || process.env.FROM_EMAIL));
+      mail.setSubject(options.subject);
+      mail.setTemplateId(options.templateId);
       var personalization = new sendgridHelper.Personalization();
-      personalization.addTo(new sendgridHelper.Email(to));
+      personalization.addTo(new sendgridHelper.Email(options.to));
 
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = substitions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var substition = _step.value;
-
-          personalization.addSubstitution(new sendgridHelper.Substitution('%' + substition.name + '%', substition.value));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
+      for (var key in options.substitions) {
+        if (options.substitions.hasOwnProperty(key)) {
+          personalization.addSubstitution(new sendgridHelper.Substitution('%' + key + '%', options.substitions[key]));
         }
       }
 

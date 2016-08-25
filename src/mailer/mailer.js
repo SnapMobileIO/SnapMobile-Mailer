@@ -40,24 +40,23 @@ class Mailer {
 
   /**
    * Sends a Sendgrid email with the Template ID
-   * @param  {String} to          the to email
-   * @param  {String} from        the from email
-   * @param  {String} subject     the email subject
-   * @param  {String} templateId  the Sendgrid template ID
-   * @param  {Array} substitions  an array of substitions
-   * @return {Promise}            a promise of the email.
+   * Defaults to process.env.FROM_EMAIL
+   * @param  {Options} options the options for the email
+   * @return {Promise} a promise of the email.
    */
-  sendMailFromTemplate(to, from, subject, templateId, substitions) {
+  sendMailFromTemplate(options) {
     let mail = new sendgridHelper.Mail();
-    mail.setFrom(sendgridHelper.Email(from));
-    mail.setSubject(subject);
-    mail.setTemplateId(templateId);
+    mail.setFrom(sendgridHelper.Email(options.from || process.env.FROM_EMAIL));
+    mail.setSubject(options.subject);
+    mail.setTemplateId(options.templateId);
     let personalization = new sendgridHelper.Personalization();
-    personalization.addTo(new sendgridHelper.Email(to));
+    personalization.addTo(new sendgridHelper.Email(options.to));
 
-    for (let substition of substitions) {
-      personalization.addSubstitution(new sendgridHelper.Substitution(`%${substition.name}%`,
-        substition.value));
+    for (let key in options.substitions) {
+      if (options.substitions.hasOwnProperty(key)) {
+        personalization.addSubstitution(new sendgridHelper.Substitution(`%${key}%`,
+          options.substitions[key]));
+      }
     }
 
     mail.addPersonalization(personalization);
@@ -68,7 +67,8 @@ class Mailer {
     });
 
     return sendgrid.API(request).then((response) => {
-      console.log(`Email template sent to ${to}, from ${from}, subject ${subject}.`);
+      console.log(`Email template sent to ${options.to},
+        from ${options.from}, subject ${options.subject}.`);
     }).catch((err) => {
       console.log(err);
     });
