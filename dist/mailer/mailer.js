@@ -88,13 +88,54 @@ var Mailer = function () {
       options.substitions = options.substitions || {};
       options.subject = options.subject || '';
       options.from = options.from || process.env.FROM_EMAIL;
+      options.fromName = options.fromName || '';
+      options.cc = options.cc || '';
+      options.ccName = options.ccName || '';
+      options.bcc = options.bcc || '';
+      options.bccName = options.bccName || '';
+      options.toName = options.toName || '';
 
       var mail = new sendgridHelper.Mail();
-      mail.setFrom(sendgridHelper.Email(options.from));
+      mail.setFrom(sendgridHelper.Email(options.from, options.fromName));
       mail.setSubject(options.subject);
       mail.setTemplateId(options.templateId);
       var personalization = new sendgridHelper.Personalization();
-      personalization.addTo(new sendgridHelper.Email(options.to));
+
+      if (options.to.constructor === Array) {
+        for (var i = options.to.length - 1; i >= 0; i--) {
+          if (options.toName.constructor === Array && i < options.toName.length) {
+            personalization.addTo(new sendgridHelper.Email(options.to[i], options.toName[i]));
+          } else {
+            personalization.addTo(new sendgridHelper.Email(options.to[i]));
+          }
+        }
+      } else {
+        personalization.addTo(new sendgridHelper.Email(options.to, options.toName));
+      }
+
+      if (options.cc.constructor === Array) {
+        for (var i = options.cc.length - 1; i >= 0; i--) {
+          if (options.ccName.constructor === Array && i < options.ccName.length) {
+            personalization.addCc(new sendgridHelper.Email(options.cc[i], options.ccName[i]));
+          } else {
+            personalization.addCc(new sendgridHelper.Email(options.cc[i]));
+          }
+        }
+      } else if (options.cc != '') {
+        personalization.addCc(new sendgridHelper.Email(options.cc, options.ccName));
+      }
+
+      if (options.bcc.constructor === Array) {
+        for (var i = options.bcc.length - 1; i >= 0; i--) {
+          if (options.bccName.constructor === Array && i < options.bccName.length) {
+            personalization.addBcc(new sendgridHelper.Email(options.bcc[i], options.bccName[i]));
+          } else {
+            personalization.addBcc(new sendgridHelper.Email(options.bcc[i]));
+          }
+        }
+      } else if (options.bcc != '') {
+        personalization.addBcc(new sendgridHelper.Email(options.bcc, options.bccName));
+      }
 
       for (var key in options.substitions) {
         if (options.substitions.hasOwnProperty(key)) {
