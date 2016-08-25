@@ -45,8 +45,17 @@ class Mailer {
    * @return {Promise} a promise of the email.
    */
   sendMailFromTemplate(options) {
+
+    if (!options || !options.templateId || !options.to) {
+      return;
+    }
+
+    options.substitions = options.substitions || {};
+    options.subject = options.subject || '';
+    options.from = options.from || process.env.FROM_EMAIL;
+
     let mail = new sendgridHelper.Mail();
-    mail.setFrom(sendgridHelper.Email(options.from || process.env.FROM_EMAIL));
+    mail.setFrom(sendgridHelper.Email(options.from));
     mail.setSubject(options.subject);
     mail.setTemplateId(options.templateId);
     let personalization = new sendgridHelper.Personalization();
