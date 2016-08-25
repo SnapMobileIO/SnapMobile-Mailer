@@ -80,8 +80,17 @@ var Mailer = function () {
   }, {
     key: 'sendMailFromTemplate',
     value: function sendMailFromTemplate(options) {
+
+      if (!options || !options.templateId || !options.to) {
+        return;
+      }
+
+      options.substitions = options.substitions || {};
+      options.subject = options.subject || '';
+      options.from = options.from || process.env.FROM_EMAIL;
+
       var mail = new sendgridHelper.Mail();
-      mail.setFrom(sendgridHelper.Email(options.from || process.env.FROM_EMAIL));
+      mail.setFrom(sendgridHelper.Email(options.from));
       mail.setSubject(options.subject);
       mail.setTemplateId(options.templateId);
       var personalization = new sendgridHelper.Personalization();
@@ -101,7 +110,7 @@ var Mailer = function () {
       });
 
       return sendgrid.API(request).then(function (response) {
-        console.log('Email template sent to ' + to + ', from ' + from + ', subject ' + subject + '.');
+        console.log('Email template sent to ' + options.to + ',\n        from ' + options.from + ', subject ' + options.subject + '.');
       }).catch(function (err) {
         console.log(err);
       });
