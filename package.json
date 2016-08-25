@@ -30,5 +30,12 @@
     "gulp-ruby-sass": "^2.0.6",
     "gulp-util": "^3.0.7",
     "jscs": "^3.0.3"
+  },
+   "dependencies": {
+    "bluebird": "^3.4.3",
+    "lodash": "^4.15.0",
+    "nodemailer": "^2.5.0",
+    "nodemailer-sendgrid-transport": "^0.2.0",
+    "sendgrid": "^4.0.2"
   }
 }
